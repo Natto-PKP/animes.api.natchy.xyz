@@ -64,9 +64,9 @@ export class UserModel extends Model implements UserModelInterface {
   @Column({ type: DataType.TEXT })
   declare avatarFile: string;
 
-  @BelongsToMany(() => AnimeModel, () => UserAnimeFavoriteAnimeModel)
+  @BelongsToMany(() => AnimeModel, { through: () => UserAnimeFavoriteAnimeModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare favoriteAnimes: AnimeModel[];
 
-  @BelongsToMany(() => CharacterModel, () => UserFavoriteCharacterModel)
+  @BelongsToMany(() => CharacterModel, { through: () => UserFavoriteCharacterModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare favoriteCharacters: CharacterModel[];
 }

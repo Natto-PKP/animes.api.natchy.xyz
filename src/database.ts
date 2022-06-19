@@ -39,7 +39,7 @@ const database = new Sequelize(process.env.PG_URL as string, {
 });
 
 // database.sync({ alter: true });
-// database.sync({ force: true });
+database.sync({ force: true });
 // database.drop({ cascade: true });
 
 export default database;

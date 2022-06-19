@@ -58,9 +58,9 @@ export class CharacterModel extends Model implements CharacterModelInterface {
   @Column({ type: DataType.TEXT })
   declare description?: string;
 
-  @BelongsToMany(() => AnimeModel, () => AnimeHasCharacterModel)
+  @BelongsToMany(() => AnimeModel, { through: () => AnimeHasCharacterModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare animes: AnimeModel[];
 
-  @BelongsToMany(() => CharacterTraitModel, () => CharacterHasTraitModel)
+  @BelongsToMany(() => CharacterTraitModel, { through: () => CharacterHasTraitModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare traits: CharacterTraitModel[];
 }

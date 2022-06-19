@@ -37,6 +37,6 @@ export class CharacterTraitModel extends Model implements CharacterTraitModelInt
   @Column({ type: DataType.TEXT })
   declare color: string;
 
-  @BelongsToMany(() => CharacterModel, () => CharacterHasTraitModel)
+  @BelongsToMany(() => CharacterModel, { through: () => CharacterHasTraitModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare characters: CharacterModel[];
 }

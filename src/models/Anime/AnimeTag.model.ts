@@ -49,9 +49,9 @@ export class AnimeTagModel extends Model implements AnimeTagModelInterface {
   @Column({ type: DataType.TEXT })
   declare userUuid: string;
 
-  @BelongsToMany(() => AnimeModel, () => AnimeHasTagModel)
+  @BelongsToMany(() => AnimeModel, { through: () => AnimeHasTagModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare animes: AnimeModel[];
 
-  @BelongsTo(() => UserModel)
+  @BelongsTo(() => UserModel, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare user: UserModel;
 }

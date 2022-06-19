@@ -73,12 +73,12 @@ export class AnimeModel extends Model implements AnimeModelInterface {
   @Column({ type: DataType.TEXT })
   declare bannerFile?: string;
 
-  @BelongsToMany(() => AnimeTagModel, () => AnimeHasTagModel)
+  @BelongsToMany(() => AnimeTagModel, { through: () => AnimeHasTagModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare tags: AnimeTagModel[];
 
-  @BelongsToMany(() => CharacterModel, () => AnimeHasCharacterModel)
+  @BelongsToMany(() => CharacterModel, { through: () => AnimeHasCharacterModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare characters: CharacterModel[];
 
-  @BelongsToMany(() => UserModel, () => UserAnimeFavoriteAnimeModel)
+  @BelongsToMany(() => UserModel, { through: () => UserAnimeFavoriteAnimeModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare users: UserModel[];
 }
