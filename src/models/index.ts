@@ -1,8 +1,6 @@
 export * from './User/User.model';
 export * from './User/UserFavoriteAnime.model';
 export * from './User/UserFavoriteCharacter.model';
-export * from './User/UserFlag.model';
-export * from './User/UserHasFlag.model';
 
 export * from './Anime/Anime.model';
 export * from './Anime/AnimeHasCharacter.model';

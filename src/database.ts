@@ -14,8 +14,6 @@ import {
   UserModel,
   UserAnimeFavoriteAnimeModel,
   UserFavoriteCharacterModel,
-  UserFlagModel,
-  UserHasFlagModel,
 } from './models';
 
 dotenv.config();
@@ -37,8 +35,6 @@ const database = new Sequelize(process.env.PG_URL as string, {
     UserModel,
     UserAnimeFavoriteAnimeModel,
     UserFavoriteCharacterModel,
-    UserFlagModel,
-    UserHasFlagModel,
   ],
 });
 
