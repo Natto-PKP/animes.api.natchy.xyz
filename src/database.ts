@@ -14,6 +14,8 @@ import {
   UserModel,
   UserAnimeFavoriteAnimeModel,
   UserFavoriteCharacterModel,
+  UserFlagModel,
+  UserHasFlagModel,
 } from './models';
 
 dotenv.config();
@@ -35,11 +37,13 @@ const database = new Sequelize(process.env.PG_URL as string, {
     UserModel,
     UserAnimeFavoriteAnimeModel,
     UserFavoriteCharacterModel,
+    UserFlagModel,
+    UserHasFlagModel,
   ],
 });
 
 // database.sync({ alter: true });
-database.sync({ force: true });
+// database.sync({ force: true });
 // database.drop({ cascade: true });
 
 export default database;

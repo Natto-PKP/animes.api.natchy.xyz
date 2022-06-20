@@ -19,6 +19,8 @@ import {
   CharacterModel,
   UserAnimeFavoriteAnimeModel,
   UserFavoriteCharacterModel,
+  UserFlagModel,
+  UserHasFlagModel,
 } from '..';
 
 export interface UserModelInterface {
@@ -27,10 +29,11 @@ export interface UserModelInterface {
   password: string;
   pseudo: string;
   discriminator: string;
-  avatarFile: string;
+  avatarFile?: string;
 
   favoriteAnimes: AnimeModel[];
   favoriteCharacters: CharacterModel[];
+  flags: UserFlagModel[];
 }
 
 @Table({ tableName: 'user', indexes: [{ unique: true, fields: ['pseudo', 'discriminator'] }] })
@@ -62,11 +65,14 @@ export class UserModel extends Model implements UserModelInterface {
 
   @Validate({ is: /.*\.(png|jpg)/ })
   @Column({ type: DataType.TEXT })
-  declare avatarFile: string;
+  declare avatarFile?: string;
 
   @BelongsToMany(() => AnimeModel, { through: () => UserAnimeFavoriteAnimeModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare favoriteAnimes: AnimeModel[];
 
   @BelongsToMany(() => CharacterModel, { through: () => UserFavoriteCharacterModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare favoriteCharacters: CharacterModel[];
+
+  @BelongsToMany(() => UserFlagModel, { through: () => UserHasFlagModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  declare flags: UserFlagModel[];
 }
