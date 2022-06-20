@@ -15,7 +15,10 @@
         "sourceType": "module",
         "project": "tsconfig.json"
       },
-      "rules": { "import/no-cycle": 0 }
+      "rules": {
+        "import/no-cycle": 0,
+        "no-bitwise": 0
+      }
     }
     // {
     //   "files": ["tests/**/*.test.ts"],

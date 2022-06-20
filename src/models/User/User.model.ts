@@ -13,15 +13,16 @@ import {
   Validate,
 } from 'sequelize-typescript';
 import { v4 as UUID } from 'uuid';
+import bcrypt from 'bcrypt';
 
 import {
   AnimeModel,
   CharacterModel,
   UserAnimeFavoriteAnimeModel,
   UserFavoriteCharacterModel,
-  UserFlagModel,
-  UserHasFlagModel,
 } from '..';
+
+import { UserPermissionsService, UserPermissionType } from '../../services/UserPermissions.service';
 
 export interface UserModelInterface {
   uuid: string;
@@ -29,11 +30,12 @@ export interface UserModelInterface {
   password: string;
   pseudo: string;
   discriminator: string;
+  tag: string;
+  permissions?: UserPermissionType[];
   avatarFile?: string;
 
   favoriteAnimes: AnimeModel[];
   favoriteCharacters: CharacterModel[];
-  flags: UserFlagModel[];
 }
 
 @Table({ tableName: 'user', indexes: [{ unique: true, fields: ['pseudo', 'discriminator'] }] })
@@ -51,7 +53,12 @@ export class UserModel extends Model implements UserModelInterface {
   declare email: string;
 
   @AllowNull(false)
-  @Column({ type: DataType.TEXT })
+  @Column({
+    type: DataType.TEXT,
+    async set(this: UserModel, password: string) {
+      this.setDataValue('password', await bcrypt.hash(password, 10));
+    },
+  })
   declare password: string;
 
   @AllowNull(false)
@@ -63,6 +70,29 @@ export class UserModel extends Model implements UserModelInterface {
   @Column({ type: DataType.TEXT })
   declare discriminator: string;
 
+  @Column({
+    type: DataType.VIRTUAL,
+    get(this: UserModel) {
+      const pseudo = this.getDataValue('pseudo') as string;
+      const discriminator = this.getDataValue('discriminator') as string;
+      return `${pseudo}#${discriminator}`;
+    },
+  })
+  declare tag: string;
+
+  @Column({
+    type: DataType.BIGINT,
+    get(this: UserModel) {
+      const bit = this.getDataValue('permissions') as bigint | null;
+      return bit ? UserPermissionsService.resolve(bit) : null;
+    },
+    set(this: UserModel, keys: UserPermissionType[]) {
+      const value = keys.length ? UserPermissionsService.merge(keys) : null;
+      this.setDataValue('permissions', value);
+    },
+  })
+  declare permissions?: UserPermissionType[];
+
   @Validate({ is: /.*\.(png|jpg)/ })
   @Column({ type: DataType.TEXT })
   declare avatarFile?: string;
@@ -72,7 +102,4 @@ export class UserModel extends Model implements UserModelInterface {
 
   @BelongsToMany(() => CharacterModel, { through: () => UserFavoriteCharacterModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare favoriteCharacters: CharacterModel[];
-
-  @BelongsToMany(() => UserFlagModel, { through: () => UserHasFlagModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-  declare flags: UserFlagModel[];
 }
