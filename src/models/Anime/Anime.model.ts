@@ -27,7 +27,6 @@ export interface AnimeModelInterface {
   description?: string;
   seasons?: number;
   episodes?: number;
-  film?: boolean;
   details?: string[];
   imageFile?: string;
   bannerFile?: string;
@@ -60,9 +59,6 @@ export class AnimeModel extends Model implements AnimeModelInterface {
 
   @Column({ type: DataType.INTEGER })
   declare episodes: number;
-
-  @Column({ type: DataType.BOOLEAN })
-  declare film: boolean;
 
   @Column({ type: DataType.JSON })
   declare details?: string[];

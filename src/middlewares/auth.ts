@@ -17,7 +17,7 @@ export default (permission?: UserPermissionType) => {
     if (typeof decoded.ms !== 'number') throw new APIError('Auth is failed', 401);
     if (typeof decoded.random !== 'string') throw new APIError('Auth is failed', 401);
     if (typeof decoded.permissions !== 'bigint' && decoded.permissions !== null) throw new APIError('Auth is failed', 401);
-    if (req.params.userUuid && decoded.uuid === req.params.userUuid) throw new APIError('Auth is failed', 401);
+    if (req.params.userUuid && decoded.uuid !== req.params.userUuid) throw new APIError('Auth is failed', 401);
 
     const perms = decoded.permissions ? UserPermissionsService.resolve(decoded.permissions) : null;
     if (permission && (!perms || !perms.includes(permission))) throw new APIError('Specific permission required', 403);

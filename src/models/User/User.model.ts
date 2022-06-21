@@ -27,12 +27,13 @@ import { UserPermissionsService, UserPermissionType } from '../../services/UserP
 export interface UserModelInterface {
   uuid: string;
   email: string;
-  password: string;
+  password?: string;
   pseudo: string;
   discriminator: string;
   tag: string;
   permissions?: UserPermissionType[];
   avatarFile?: string;
+  private: boolean;
 
   favoriteAnimes: AnimeModel[];
   favoriteCharacters: CharacterModel[];
@@ -55,11 +56,12 @@ export class UserModel extends Model implements UserModelInterface {
   @AllowNull(false)
   @Column({
     type: DataType.TEXT,
-    async set(this: UserModel, password: string) {
-      this.setDataValue('password', await bcrypt.hash(password, 10));
+    set(this: UserModel, value: string) {
+      const password = bcrypt.hashSync(value, 10);
+      this.setDataValue('password', password);
     },
   })
-  declare password: string;
+  declare password?: string;
 
   @AllowNull(false)
   @Column({ type: DataType.TEXT })
@@ -96,6 +98,11 @@ export class UserModel extends Model implements UserModelInterface {
   @Validate({ is: /.*\.(png|jpg)/ })
   @Column({ type: DataType.TEXT })
   declare avatarFile?: string;
+
+  @Default(false)
+  @AllowNull(false)
+  @Column({ type: DataType.BOOLEAN })
+  declare private: boolean;
 
   @BelongsToMany(() => AnimeModel, { through: () => UserAnimeFavoriteAnimeModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare favoriteAnimes: AnimeModel[];

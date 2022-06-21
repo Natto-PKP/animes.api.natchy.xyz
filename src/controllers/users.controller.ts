@@ -21,10 +21,10 @@ export default {
   },
 
   getOne: async (req: Request, res: Response) => {
-    const user = await UserModel.findByPk(req.params.userUuid, { raw: true });
+    const user = await UserModel.findByPk(req.params.userUuid);
     if (!user) throw new APIError('User not found', 404);
 
-    user.password = '';
+    delete user.password;
     res.status(200).json(user);
   },
 
@@ -32,7 +32,7 @@ export default {
     const { email, password } = req.body;
     const user = await UserModel.findOne({ where: { email } });
     if (!user) throw new APIError('Invalid email or password', 400);
-    if (!(await bcrypt.compare(password, user.password))) throw new APIError('Invalid email or password', 400);
+    if (!(await bcrypt.compare(password, user.password as string))) throw new APIError('Invalid email or password', 400);
 
     const token = jwt.sign({
       ms: Date.now(),
@@ -41,7 +41,7 @@ export default {
       random: UUID(),
     }, process.env.JWT_SECRET as string);
 
-    res.status(200).json({ token });
+    res.status(200).json({ token, uuid: user.uuid });
   },
 
   register: async ({ body }: Request, res: Response) => {
@@ -53,12 +53,19 @@ export default {
     if (!discriminator) throw new APIError('Nickname already taken too many times', 400);
 
     await UserModel.create({ ...body, discriminator });
-    res.json(201).json(null);
+    res.status(201).json(null);
   },
 
   updateOne: async (req: Request, res: Response) => {
     const user = await UserModel.findByPk(req.params.userUuid);
     if (!user) throw new APIError('User not found', 404);
+
+    if (typeof req.body.pseudo === 'string') {
+      const usersWithSamePseudo = await UserModel.findAll({ attributes: ['discriminator'], where: { pseudo: req.body.pseudo }, limit: 10 });
+      const discriminator = generateDiscriminator(usersWithSamePseudo.map((u) => u.discriminator));
+      if (!discriminator) throw new APIError('Nickname already taken too many times', 400);
+      req.body.discriminator = discriminator;
+    }
 
     if (req.file) {
       if (req.file.size > 625e3) throw new APIError('Avatar too heavy (max 5mo)', 400);
