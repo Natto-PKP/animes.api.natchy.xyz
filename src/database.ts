@@ -18,7 +18,7 @@ import {
 
 dotenv.config();
 
-const database = new Sequelize(process.env.PG_URL as string, {
+const database = new Sequelize(process.env.PG_URI as string, {
   define: { underscored: true },
   dialect: 'postgres',
   logging: false,
