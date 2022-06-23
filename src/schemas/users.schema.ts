@@ -16,9 +16,14 @@ export default {
     pseudo: pseudo.required(),
   }).length(3).required(),
 
-  update: Joi.object({
+  updateOne: Joi.object({
     email,
     password,
     pseudo,
   }).min(1).max(4).required(),
+
+  getAllQuery: Joi.object({
+    search: Joi.string().min(2).max(32).pattern(/^(?=.{2,37}$)(?![_ .])(?!.*[_.]{2})[a-zA-Z0-9. _]+(?<![_ .])(#[0-9]{4})?$/),
+    limit: Joi.number().integer().positive(),
+  }).max(2),
 };

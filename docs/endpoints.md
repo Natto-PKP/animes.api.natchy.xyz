@@ -1,22 +1,23 @@
 # Users
 
-| method |           route           | auth | details                  |
-| :----: | :-----------------------: | :--: | :----------------------- |
-| DELETE |     /users/:userUuid      | true | Delete user              |
-|  GET   |     /users/:userUuid      | true | Get all user info        |
-|  GET   |     /users?user=value     | true | Get all users info       |
-|  GET   | /users/:userUuid/profile  |      | Get user profile         |
-|  GET   | /users/profile?user=value |      | Get all users profiles   |
-| PATCH  |     /users/:userUuid      | true | Update user              |
-|        |                           |      |                          |
-|  POST  |       /users/login        |      | Login and get token      |
-|  POST  |      /users/register      |      | Register and create user |
+| method |                  route                  | auth | details                  |
+| :----: | :-------------------------------------: | :--: | :----------------------- |
+| DELETE |            /users/:userUuid             | true | Delete user              |
+|  GET   |            /users/:userUuid             | true | Get all user info        |
+|  GET   |     /users?search=value&limit=value     | true | Get all users info       |
+|  GET   |        /users/:userUuid/profile         |      | Get user profile         |
+|  GET   | /users/profile?search=value&limit=value |      | Get all users profiles   |
+| PATCH  |            /users/:userUuid             | true | Update user              |
+|        |                                         |      |                          |
+|  POST  |              /users/login               |      | Login and get token      |
+|  POST  |             /users/register             |      | Register and create user |
 
 **QUERY:**
 
-- **user** :: User tag (ferret123#0784) or User pseudo (ferret123)
-  - `/users?user=ferret123`
-  - `/users/profile?user=ferret123#0784`
+- **search** :: User tag (ferret123#0784) or User pseudo (ferret123)
+  - `/users?search=ferret123`
+  - `/users/profile?search=ferret123#0784`
+- **limit** :: Limit of users
 
 ## Animes
 

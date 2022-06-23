@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-/* eslint-disable jest/no-commented-out-tests */
 import supertest from 'supertest';
 import { faker } from '@faker-js/faker';
 import { v4 as UUID } from 'uuid';
@@ -100,6 +98,40 @@ describe('/login [POST]', () => {
   });
 });
 
+describe('/ [GET]', () => {
+  it('specific permission required', async () => {
+    expect.hasAssertions();
+
+    const { body, status } = await request.get('/users').set('Authorization', user.token as string);
+
+    expect(status).toBe(403);
+    expect(typeof body).toBe('object');
+    expect(body.code).toBe(status);
+  });
+});
+
+describe('/profile [GET]', () => {
+  it('users profile get correctly', async () => {
+    expect.hasAssertions();
+
+    const { body, status } = await request.get('/users/profile');
+
+    expect(status).toBe(200);
+    expect(Array.isArray(body)).toBeTruthy();
+
+    body.forEach((profile: any) => {
+      expect(typeof profile).toBe('object');
+      expect(typeof profile.uuid).toBe('string');
+      expect(profile.email).toBeUndefined();
+      expect(typeof profile.pseudo).toBe('string');
+      expect(profile.discriminator).toMatch(/^[0-9]{4}$/);
+      expect(profile.tag).toMatch(new RegExp(`^${profile.pseudo}#[0-9]{4}$`));
+      expect(profile.permissions).toBeUndefined();
+      expect(profile.avatarFile).toBeNull();
+    });
+  });
+});
+
 describe('/:userUuid [GET]', () => {
   it('user get correctly', async () => {
     expect.hasAssertions();
@@ -122,9 +154,27 @@ describe('/:userUuid [GET]', () => {
 
     const { body, status } = await request.get(`/users/${UUID()}`).set('Authorization', user.token as string);
 
-    expect(status).toBe(401);
+    expect(status).toBe(403);
     expect(typeof body).toBe('object');
     expect(body.code).toBe(status);
+  });
+});
+
+describe('/:userUuid/profile [GET]', () => {
+  it('user profile get correctly', async () => {
+    expect.hasAssertions();
+
+    const { body, status } = await request.get(`/users/${user.uuid}/profile`);
+
+    expect(status).toBe(200);
+    expect(typeof body).toBe('object');
+    expect(typeof body.uuid).toBe('string');
+    expect(body.email).toBeUndefined();
+    expect(typeof body.pseudo).toBe('string');
+    expect(body.discriminator).toMatch(/^[0-9]{4}$/);
+    expect(body.tag).toMatch(new RegExp(`^${body.pseudo}#[0-9]{4}$`));
+    expect(body.permissions).toBeUndefined();
+    expect(body.avatarFile).toBeNull();
   });
 });
 

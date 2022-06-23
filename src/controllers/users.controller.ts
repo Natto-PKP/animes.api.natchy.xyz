@@ -3,28 +3,73 @@ import { v4 as UUID } from 'uuid';
 import bcrypt from 'bcrypt';
 import { writeFile } from 'fs/promises';
 import path from 'path';
+import { Op } from 'sequelize';
 
 import type { Request, Response } from 'express';
 
 import APIError from '../errors/APIError';
 import { UserModel } from '../models';
-import { UserPermissionsService } from '../services/UserPermissions.service';
 import generateDiscriminator from '../functions/generateDiscriminator';
 
 export default {
   deleteOne: async (req: Request, res: Response) => {
     const user = await UserModel.findByPk(req.params.userUuid);
     if (!user) throw new APIError('User not found', 404);
-
     await user.destroy();
     res.status(204).json(null);
+  },
+
+  getAll: async (req: Request, res: Response) => {
+    const search = req.query.search as string | undefined;
+    const limit = Number(req.query.limit) || undefined;
+
+    if (search) {
+      const [pseudo, discriminator] = search.split('#');
+      const users = await UserModel.findAll({ where: { pseudo: { [Op.iLike]: `%${pseudo}%` }, discriminator }, limit });
+      res.status(200).json(users.map((user) => user.toJSON()));
+    } else {
+      const users = await UserModel.findAll({ limit });
+      res.status(200).json(users.map((user) => user.toJSON()));
+    }
+  },
+
+  getAllProfile: async (req: Request, res: Response) => {
+    const search = req.query.search as string | undefined;
+    const limit = Number(req.query.limit) || undefined;
+
+    if (search) {
+      const [pseudo, discriminator] = search.split('#');
+
+      const users = await UserModel.findAll({
+        attributes: ['uuid', 'pseudo', 'discriminator', 'tag', 'avatarFile', 'private'],
+        where: { pseudo: { [Op.iLike]: `%${pseudo}%` }, discriminator, private: false },
+        limit,
+      });
+
+      res.status(200).json(users.map((user) => user.toJSON()));
+    } else {
+      const users = await UserModel.findAll({
+        attributes: ['uuid', 'pseudo', 'discriminator', 'tag', 'avatarFile', 'private'],
+        where: { private: false },
+        limit,
+      });
+
+      res.status(200).json(users.map((user) => user.toJSON()));
+    }
   },
 
   getOne: async (req: Request, res: Response) => {
     const user = await UserModel.findByPk(req.params.userUuid);
     if (!user) throw new APIError('User not found', 404);
-
     delete user.password;
+    res.status(200).json(user);
+  },
+
+  getOneProfile: async (req: Request, res: Response) => {
+    const user = await UserModel.findByPk(req.params.userUuid, { attributes: ['uuid', 'pseudo', 'discriminator', 'tag', 'avatarFile', 'private'] });
+    if (!user) throw new APIError('User not found', 404);
+    if (user.private && user.uuid !== req.author.uuid) throw new APIError('User profile is private', 403);
+
     res.status(200).json(user);
   },
 
@@ -34,13 +79,8 @@ export default {
     if (!user) throw new APIError('Invalid email or password', 400);
     if (!(await bcrypt.compare(password, user.password as string))) throw new APIError('Invalid email or password', 400);
 
-    const token = jwt.sign({
-      ms: Date.now(),
-      uuid: user.uuid,
-      permissions: user.permissions ? UserPermissionsService.merge(user.permissions) : null,
-      random: UUID(),
-    }, process.env.JWT_SECRET as string);
-
+    const secret = process.env.JWT_SECRET as string;
+    const token = jwt.sign({ ms: Date.now(), uuid: user.uuid, random: UUID() }, secret);
     res.status(200).json({ token, uuid: user.uuid });
   },
 
