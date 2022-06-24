@@ -18,14 +18,16 @@ import bcrypt from 'bcrypt';
 import {
   AnimeModel,
   CharacterModel,
-  UserAnimeFavoriteAnimeModel,
+  UserFavoriteAnimeModel,
   UserFavoriteCharacterModel,
 } from '..';
 
+import Identifier from '../../services/Identifier.service';
 import { UserPermissionsService, UserPermissionType } from '../../services/UserPermissions.service';
 
 export interface UserModelInterface {
   uuid: string;
+  identifier: string;
   email: string;
   password?: string;
   pseudo: string;
@@ -46,6 +48,12 @@ export class UserModel extends Model implements UserModelInterface {
   @IsUUID(4)
   @Column({ type: DataType.TEXT })
   declare uuid: string;
+
+  @Unique
+  @Default(() => Identifier.generate())
+  @AllowNull(false)
+  @Column({ type: DataType.TEXT })
+  declare identifier: string;
 
   @AllowNull(false)
   @Unique
@@ -104,7 +112,7 @@ export class UserModel extends Model implements UserModelInterface {
   @Column({ type: DataType.BOOLEAN })
   declare private: boolean;
 
-  @BelongsToMany(() => AnimeModel, { through: () => UserAnimeFavoriteAnimeModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @BelongsToMany(() => AnimeModel, { through: () => UserFavoriteAnimeModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare favoriteAnimes: AnimeModel[];
 
   @BelongsToMany(() => CharacterModel, { through: () => UserFavoriteCharacterModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })

@@ -8,9 +8,11 @@ import {
   AllowNull,
   PrimaryKey,
   Table,
+  Unique,
 } from 'sequelize-typescript';
 import { v4 as UUID } from 'uuid';
 
+import Identifier from '../../services/Identifier.service';
 import {
   AnimeModel,
   AnimeHasCharacterModel,
@@ -20,6 +22,7 @@ import {
 
 export interface CharacterModelInterface {
   uuid: string;
+  identifier: string;
   name: string;
   aliases?: string[];
   gender?: string;
@@ -38,6 +41,12 @@ export class CharacterModel extends Model implements CharacterModelInterface {
   @IsUUID(4)
   @Column({ type: DataType.TEXT })
   declare uuid: string;
+
+  @Unique
+  @Default(() => Identifier.generate())
+  @AllowNull(false)
+  @Column({ type: DataType.TEXT })
+  declare identifier: string;
 
   @AllowNull(false)
   @Column({ type: DataType.TEXT })

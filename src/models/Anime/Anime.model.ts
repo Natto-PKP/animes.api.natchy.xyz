@@ -8,20 +8,23 @@ import {
   AllowNull,
   PrimaryKey,
   BelongsToMany,
+  Unique,
 } from 'sequelize-typescript';
 import { v4 as uuid } from 'uuid';
 
+import Identifier from '../../services/Identifier.service';
 import {
   AnimeTagModel,
   AnimeHasCharacterModel,
   AnimeHasTagModel,
   CharacterModel,
   UserModel,
-  UserAnimeFavoriteAnimeModel,
+  UserFavoriteAnimeModel,
 } from '..';
 
 export interface AnimeModelInterface {
   uuid: string;
+  identifier: string;
   name: string;
   aliases?: string[];
   description?: string;
@@ -43,6 +46,12 @@ export class AnimeModel extends Model implements AnimeModelInterface {
   @IsUUID(4)
   @Column({ type: DataType.TEXT })
   declare uuid: string;
+
+  @Unique
+  @Default(() => Identifier.generate())
+  @AllowNull(false)
+  @Column({ type: DataType.TEXT })
+  declare identifier: string;
 
   @AllowNull(false)
   @Column({ type: DataType.TEXT })
@@ -75,6 +84,6 @@ export class AnimeModel extends Model implements AnimeModelInterface {
   @BelongsToMany(() => CharacterModel, { through: () => AnimeHasCharacterModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare characters: CharacterModel[];
 
-  @BelongsToMany(() => UserModel, { through: () => UserAnimeFavoriteAnimeModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @BelongsToMany(() => UserModel, { through: () => UserFavoriteAnimeModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare users: UserModel[];
 }

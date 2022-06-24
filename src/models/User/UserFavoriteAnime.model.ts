@@ -9,16 +9,16 @@ import {
 
 import { AnimeModel, UserModel } from '..';
 
-export interface UserAnimeFavoriteAnimeModelInterface {
+export interface UserFavoriteAnimeModelInterface {
   animeUuid: string;
   userUuid: string;
   rating?: number;
 }
 
 @Table({ tableName: 'user_has_favorite_anime', indexes: [{ unique: true, fields: ['anime_uuid', 'user_uuid'] }] })
-export class UserAnimeFavoriteAnimeModel
+export class UserFavoriteAnimeModel
   extends Model
-  implements UserAnimeFavoriteAnimeModelInterface {
+  implements UserFavoriteAnimeModelInterface {
   @AllowNull(false)
   @ForeignKey(() => AnimeModel)
   @Column({ type: DataType.TEXT })

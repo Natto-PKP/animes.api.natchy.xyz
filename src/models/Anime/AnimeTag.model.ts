@@ -15,10 +15,12 @@ import {
 } from 'sequelize-typescript';
 import { v4 as UUID } from 'uuid';
 
+import Identifier from '../../services/Identifier.service';
 import { UserModel, AnimeModel, AnimeHasTagModel } from '..';
 
 export interface AnimeTagModelInterface {
   uuid: string;
+  identifier: string;
   name: string;
   color: string;
   userUuid?: string;
@@ -34,6 +36,12 @@ export class AnimeTagModel extends Model implements AnimeTagModelInterface {
   @IsUUID(4)
   @Column({ type: DataType.TEXT })
   declare uuid: string;
+
+  @Unique
+  @Default(() => Identifier.generate())
+  @AllowNull(false)
+  @Column({ type: DataType.TEXT })
+  declare identifier: string;
 
   @AllowNull(false)
   @Unique

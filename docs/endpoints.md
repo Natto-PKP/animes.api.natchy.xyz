@@ -17,20 +17,20 @@
 - **search** :: User tag (ferret123#0784) or User pseudo (ferret123)
   - `/users?search=ferret123`
   - `/users/profile?search=ferret123#0784`
-- **limit** :: Limit of users
+- **limit** :: results limit
 
 ## Animes
 
-| method |                               route                               | auth | details               |
-| :----: | :---------------------------------------------------------------: | :--: | :-------------------- |
-| DELETE |                /users/:userUuid/animes/:animeUuid                 | true | Remove user anime     |
-|  GET   | /users/:userUuid/animes?search=value&tags=values&characters=value |      | Get user animes       |
-|  GET   |                /users/:userUuid/animes/:animeUuid                 |      | Get user anime        |
-|  POST  |                      /users/:userUuid/animes                      | true | Add user anime        |
-|        |                                                                   |      |                       |
-| DELETE |         /users/:userUuid/animes/:animeUuid/tags/:tagUuid          | true | Remove user anime tag |
-|  GET   |              /users/:userUuid/animes/:animeUuid/tags              |      | Get user anime tags   |
-|  POST  |         /users/:userUuid/animes/:animeUuid/tags/:tagUuid          | true | Add user anime tag    |
+| method |                                     route                                     | auth | details               |
+| :----: | :---------------------------------------------------------------------------: | :--: | :-------------------- |
+| DELETE |                      /users/:userUuid/animes/:animeUuid                       | true | Remove user anime     |
+|  GET   | /users/:userUuid/animes?search=value&tags=values&characters=value&limit=value |      | Get user animes       |
+|  GET   |                      /users/:userUuid/animes/:animeUuid                       |      | Get user anime        |
+|  POST  |                            /users/:userUuid/animes                            | true | Add user anime        |
+|        |                                                                               |      |                       |
+| DELETE |               /users/:userUuid/animes/:animeUuid/tags/:tagUuid                | true | Remove user anime tag |
+|  GET   |                    /users/:userUuid/animes/:animeUuid/tags                    |      | Get user anime tags   |
+|  POST  |               /users/:userUuid/animes/:animeUuid/tags/:tagUuid                | true | Add user anime tag    |
 
 **QUERY:**
 
@@ -45,6 +45,7 @@
   - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/animes?characters=echi`
   - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/animes?characters=echidna`
   - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/animes?characters=echidna&characters=sophie`
+- **limit** :: results limit
 
 ## Characters
 
