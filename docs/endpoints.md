@@ -75,6 +75,22 @@
 - **anime** :: Filter with anime name or aliases
   - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/characters?anime=spice+and+wolf`
 
+## Tags
+
+| method |                     route                      | auth | details         |
+| :----: | :--------------------------------------------: | :--: | :-------------- |
+| DELETE |         /users/:userUuid/tags/:tagUuid         | true | Remove user tag |
+|  GET   | /users/:userUuid/tags?search=value&limit=value |      | Get user tags   |
+|  GET   |         /users/:userUuid/tags/:tagUuid         |      | Get user tag    |
+|  POST  |            /users/:userUuid/animes             | true | Add user tag    |
+
+**QUERY:**
+
+- **search** :: Filter with anime name or anime aliases
+  - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/animes?search=romance`
+  - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/animes?search=slice+of`
+- **limit** :: results limit
+
 # Animes
 
 | method |                       route                       | auth | details               |
