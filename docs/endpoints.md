@@ -26,6 +26,7 @@
 | DELETE |                      /users/:userUuid/animes/:animeUuid                       | true | Remove user anime     |
 |  GET   | /users/:userUuid/animes?search=value&tags=values&characters=value&limit=value |      | Get user animes       |
 |  GET   |                      /users/:userUuid/animes/:animeUuid                       |      | Get user anime        |
+| PATCH  |                      /users/:userUuid/animes/:animeUuid                       | true | Update user anime     |
 |  POST  |                            /users/:userUuid/animes                            | true | Add user anime        |
 |        |                                                                               |      |                       |
 | DELETE |               /users/:userUuid/animes/:animeUuid/tags/:tagUuid                | true | Remove user anime tag |
@@ -82,6 +83,7 @@
 | DELETE |         /users/:userUuid/tags/:tagUuid         | true | Remove user tag |
 |  GET   | /users/:userUuid/tags?search=value&limit=value |      | Get user tags   |
 |  GET   |         /users/:userUuid/tags/:tagUuid         |      | Get user tag    |
+| PATCH  |         /users/:userUuid/tags/:tagUuid         |      | Update user tag |
 |  POST  |            /users/:userUuid/animes             | true | Add user tag    |
 
 **QUERY:**
@@ -98,6 +100,7 @@
 | DELETE |                /animes/:animeUuid                 | true | Remove user anime     |
 |  GET   | /animes?search=value&tags=values&characters=value |      | Get user animes       |
 |  GET   |                /animes/:animeUuid                 |      | Get user anime        |
+| PATCH  |                /animes/:animeUuid                 | true | Update user anime     |
 |  POST  |                      /animes                      | true | Add user anime        |
 |        |                                                   |      |                       |
 | DELETE |         /animes/:animeUuid/tags/:tagUuid          | true | Remove user anime tag |
