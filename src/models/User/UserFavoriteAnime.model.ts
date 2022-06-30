@@ -9,10 +9,13 @@ import {
 
 import { AnimeModel, UserModel } from '..';
 
-export interface UserFavoriteAnimeModelInterface {
+export interface UserFavoriteAnimeDataInterface {
+  rating?: number;
+}
+
+export interface UserFavoriteAnimeModelInterface extends UserFavoriteAnimeDataInterface {
   animeUuid: string;
   userUuid: string;
-  rating?: number;
 }
 
 @Table({ tableName: 'user_has_favorite_anime', indexes: [{ unique: true, fields: ['anime_uuid', 'user_uuid'] }] })

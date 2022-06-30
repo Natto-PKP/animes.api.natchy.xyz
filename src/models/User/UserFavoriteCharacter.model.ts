@@ -8,10 +8,13 @@ import {
 } from 'sequelize-typescript';
 import { UserModel, CharacterModel } from '..';
 
-export interface UserFavoriteCharacterModelInterface {
+export interface UserFavoriteCharacterDataInterface {
+  rating?: number;
+}
+
+export interface UserFavoriteCharacterModelInterface extends UserFavoriteCharacterDataInterface {
   characterUuid: string;
   userUuid: string;
-  rating?: number;
 }
 
 @Table({ tableName: 'user_has_favorite_character', indexes: [{ unique: true, fields: ['character_uuid', 'user_uuid'] }] })

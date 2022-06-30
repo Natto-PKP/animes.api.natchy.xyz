@@ -18,13 +18,15 @@ import { v4 as UUID } from 'uuid';
 import Identifier from '../../services/Identifier.service';
 import { UserModel, AnimeModel, AnimeHasTagModel } from '..';
 
-export interface AnimeTagModelInterface {
-  uuid: string;
-  identifier: string;
+export interface AnimeTagDataInterface {
   name: string;
   color: string;
   userUuid?: string;
+}
 
+export interface AnimeTagModelInterface extends AnimeTagDataInterface {
+  uuid: string;
+  identifier: string;
   animes: AnimeModel[];
   user: UserModel;
 }

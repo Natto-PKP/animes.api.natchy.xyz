@@ -15,12 +15,14 @@ import { v4 as UUID } from 'uuid';
 import { CharacterModel, CharacterHasTraitModel } from '..';
 import Identifier from '../../services/Identifier.service';
 
-export interface CharacterTraitModelInterface {
-  uuid: string;
-  identifier: string;
+export interface CharacterTraitDataInterface {
   name: string;
   color: string;
+}
 
+export interface CharacterTraitModelInterface extends CharacterTraitDataInterface {
+  uuid: string;
+  identifier: string;
   characters: CharacterModel[]
 }
 

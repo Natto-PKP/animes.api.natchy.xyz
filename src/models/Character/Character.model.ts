@@ -20,15 +20,18 @@ import {
   CharacterHasTraitModel,
 } from '..';
 
-export interface CharacterModelInterface {
-  uuid: string;
-  identifier: string;
+export interface CharacterDataInterface {
   name: string;
   aliases?: string[];
   gender?: string;
   race?: string;
   age?: number;
   description?: string;
+}
+
+export interface CharacterModelInterface extends CharacterDataInterface {
+  uuid: string;
+  identifier: string;
 
   animes: AnimeModel[];
   traits: CharacterTraitModel[];
