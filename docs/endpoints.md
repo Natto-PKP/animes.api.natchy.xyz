@@ -21,17 +21,13 @@
 
 ## Animes
 
-| method |                                     route                                     | auth | details               |
-| :----: | :---------------------------------------------------------------------------: | :--: | :-------------------- |
-| DELETE |                      /users/:userUuid/animes/:animeUuid                       | true | Remove user anime     |
-|  GET   | /users/:userUuid/animes?search=value&tags=values&characters=value&limit=value |      | Get user animes       |
-|  GET   |                      /users/:userUuid/animes/:animeUuid                       |      | Get user anime        |
-| PATCH  |                      /users/:userUuid/animes/:animeUuid                       | true | Update user anime     |
-|  POST  |                            /users/:userUuid/animes                            | true | Add user anime        |
-|        |                                                                               |      |                       |
-| DELETE |               /users/:userUuid/animes/:animeUuid/tags/:tagUuid                | true | Remove user anime tag |
-|  GET   |                    /users/:userUuid/animes/:animeUuid/tags                    |      | Get user anime tags   |
-|  POST  |               /users/:userUuid/animes/:animeUuid/tags/:tagUuid                | true | Add user anime tag    |
+| method |                                     route                                     | auth | details           |
+| :----: | :---------------------------------------------------------------------------: | :--: | :---------------- |
+| DELETE |                      /users/:userUuid/animes/:animeUuid                       | true | Remove user anime |
+|  GET   | /users/:userUuid/animes?search=value&tags=values&characters=value&limit=value |      | Get user animes   |
+|  GET   |                      /users/:userUuid/animes/:animeUuid                       |      | Get user anime    |
+| PATCH  |                      /users/:userUuid/animes/:animeUuid                       | true | Update user anime |
+|  POST  |                            /users/:userUuid/animes                            | true | Add user anime    |
 
 **QUERY:**
 
@@ -46,6 +42,27 @@
   - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/animes?characters=echi`
   - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/animes?characters=echidna`
   - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/animes?characters=echidna&characters=sophie`
+- **limit** :: results limit
+
+### Tags
+
+| method |                         route                         | auth | details               |
+| :----: | :---------------------------------------------------: | :--: | :-------------------- |
+| DELETE |         /users/:userUuid/animes/tags/:tagUuid         | true | Remove user anime tag |
+|  GET   | /users/:userUuid/animes/tags?search=value&limit=value |      | Get user anime tags   |
+|  GET   |         /users/:userUuid/animes/tags/:tagUuid         |      | Get user anime tag    |
+| PATCH  |         /users/:userUuid/animes/tags/:tagUuid         | true | Update user anime tag |
+|  POST  |             /users/:userUuid/animes/tags              | true | Add user anime tag    |
+|        |                                                       |      |                       |
+| DELETE |   /users/:userUuid/animes/:animeUuid/tags/:tagUuid    | true | Remove user anime tag |
+|  GET   |        /users/:userUuid/animes/:animeUuid/tags        |      | Get user anime tags   |
+|  POST  |   /users/:userUuid/animes/:animeUuid/tags/:tagUuid    | true | Add user anime tag    |
+
+**QUERY:**
+
+- **search** :: Filter with anime name or anime aliases
+  - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/animes?search=romance`
+  - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/animes?search=slice+of`
 - **limit** :: results limit
 
 ## Characters
@@ -75,23 +92,6 @@
   - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/characters?traits=sensitive&traits=calm`
 - **anime** :: Filter with anime name or aliases
   - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/characters?anime=spice+and+wolf`
-
-## Tags
-
-| method |                     route                      | auth | details         |
-| :----: | :--------------------------------------------: | :--: | :-------------- |
-| DELETE |         /users/:userUuid/tags/:tagUuid         | true | Remove user tag |
-|  GET   | /users/:userUuid/tags?search=value&limit=value |      | Get user tags   |
-|  GET   |         /users/:userUuid/tags/:tagUuid         |      | Get user tag    |
-| PATCH  |         /users/:userUuid/tags/:tagUuid         |      | Update user tag |
-|  POST  |            /users/:userUuid/animes             | true | Add user tag    |
-
-**QUERY:**
-
-- **search** :: Filter with anime name or anime aliases
-  - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/animes?search=romance`
-  - `/users/de1b46e9-776d-42fa-adef-9e843db84f17/animes?search=slice+of`
-- **limit** :: results limit
 
 # Animes
 
