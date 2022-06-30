@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 
-import APIError from '../errors/APIError';
+import APIError from './APIError';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default (error: Error, req: Request, res: Response, _next: NextFunction) => {
