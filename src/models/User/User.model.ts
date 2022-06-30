@@ -11,10 +11,11 @@ import {
   Table,
   Unique,
   Validate,
+  BeforeDestroy,
 } from 'sequelize-typescript';
 import { v4 as UUID } from 'uuid';
 import bcrypt from 'bcrypt';
-import { writeFileSync } from 'fs';
+import { unlink, writeFile } from 'fs/promises';
 
 import path from 'path';
 import {
@@ -124,15 +125,19 @@ export class UserModel extends Model implements UserModelInterface {
   @Validate({ is: /.*\.(png|jpg)/ })
   @Column({
     type: DataType.TEXT,
-    set(this: UserModel, file: Express.Multer.File) {
+    async set(this: UserModel, file: Express.Multer.File) {
+      const currentValue = this.getDataValue('avatarFile');
+      if (currentValue) await unlink(path.join(STORAGE_PATH, 'users/avatars', currentValue)).catch(() => null);
       if (file.size > AVATAR_FILE_SIZE) throw new DBError('Avatar too heavy (max 5mo)');
 
       const match = file.filename.match(/^(.*)\.(.*)$/);
       if (!match) throw new DBError('Invalid file name');
-      if (!['png', 'jpg'].includes(match[2])) throw new DBError('Avatar must be a png or jpg');
-      const fileName = `avatar_${UUID()}`;
+      const ext = match[2];
 
-      writeFileSync(path.join(STORAGE_PATH, 'users/avatars', fileName), file.buffer);
+      if (!['png', 'jpg'].includes(ext)) throw new DBError('Avatar must be a png or jpg');
+      const fileName = `avatar_${UUID()}.${ext}`;
+
+      await writeFile(path.join(STORAGE_PATH, 'users/avatars', fileName), file.buffer);
       this.setDataValue('avatarFile', fileName);
     },
   })
@@ -148,4 +153,9 @@ export class UserModel extends Model implements UserModelInterface {
 
   @BelongsToMany(() => CharacterModel, { through: () => UserFavoriteCharacterModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare favoriteCharacters: CharacterModel[];
+
+  @BeforeDestroy
+  static async removeFile(user: UserModel) {
+    if (user.avatarFile) await unlink(path.join(STORAGE_PATH, 'users/avatars', user.avatarFile)).catch(() => null);
+  }
 }

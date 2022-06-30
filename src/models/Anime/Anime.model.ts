@@ -9,9 +9,10 @@ import {
   PrimaryKey,
   BelongsToMany,
   Unique,
+  BeforeDestroy,
 } from 'sequelize-typescript';
 import { v4 as uuid } from 'uuid';
-import { writeFileSync } from 'fs';
+import { unlink, writeFile } from 'fs/promises';
 import path from 'path';
 
 import Identifier from '../../services/Identifier.service';
@@ -83,31 +84,39 @@ export class AnimeModel extends Model implements AnimeModelInterface {
 
   @Column({
     type: DataType.TEXT,
-    set(this: AnimeModel, file: Express.Multer.File) {
+    async set(this: AnimeModel, file: Express.Multer.File) {
+      const currentValue = this.getDataValue('imageFile');
+      if (currentValue) await unlink(path.join(STORAGE_PATH, 'animes/avatars', currentValue)).catch(() => null);
       if (file.size > AVATAR_FILE_SIZE) throw new DBError('Avatar too heavy (max 5mo)');
 
       const match = file.filename.match(/^(.*)\.(.*)$/);
       if (!match) throw new DBError('Invalid file name');
-      if (!['png', 'jpg'].includes(match[2])) throw new DBError('Avatar must be a png or jpg');
-      const fileName = `avatar_${uuid()}`;
+      const ext = match[2];
 
-      writeFileSync(path.join(STORAGE_PATH, 'animes/avatars', fileName), file.buffer);
-      this.setDataValue('avatarFile', fileName);
+      if (!['png', 'jpg'].includes(ext)) throw new DBError('Avatar must be a png or jpg');
+      const fileName = `avatar_${uuid()}.${ext}`;
+
+      await writeFile(path.join(STORAGE_PATH, 'animes/avatars', fileName), file.buffer);
+      this.setDataValue('imageFile', fileName);
     },
   })
   declare imageFile?: string;
 
   @Column({
     type: DataType.TEXT,
-    set(this: AnimeModel, file: Express.Multer.File) {
+    async set(this: AnimeModel, file: Express.Multer.File) {
+      const currentValue = this.getDataValue('bannerFile');
+      if (currentValue) await unlink(path.join(STORAGE_PATH, 'animes/banners', currentValue)).catch(() => null);
       if (file.size > BANNER_FILE_SIZE) throw new DBError('Banner too heavy (max 5mo)');
 
       const match = file.filename.match(/^(.*)\.(.*)$/);
       if (!match) throw new DBError('Invalid file name');
-      if (!['png', 'jpg'].includes(match[2])) throw new DBError('Banner must be a png or jpg');
-      const fileName = `banner_${uuid()}`;
+      const ext = match[2];
 
-      writeFileSync(path.join(STORAGE_PATH, 'animes/banners', fileName), file.buffer);
+      if (!['png', 'jpg'].includes(ext)) throw new DBError('Banner must be a png or jpg');
+      const fileName = `banner_${uuid()}.${ext}`;
+
+      await writeFile(path.join(STORAGE_PATH, 'animes/banners', fileName), file.buffer);
       this.setDataValue('bannerFile', fileName);
     },
   })
@@ -121,4 +130,10 @@ export class AnimeModel extends Model implements AnimeModelInterface {
 
   @BelongsToMany(() => UserModel, { through: () => UserFavoriteAnimeModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare users?: UserModel[];
+
+  @BeforeDestroy
+  static async removeFile(anime: AnimeModel) {
+    if (anime.imageFile) await unlink(path.join(STORAGE_PATH, 'animes/avatars', anime.imageFile)).catch(() => null);
+    if (anime.bannerFile) await unlink(path.join(STORAGE_PATH, 'animes/banners', anime.bannerFile)).catch(() => null);
+  }
 }
