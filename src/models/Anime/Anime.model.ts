@@ -10,9 +10,10 @@ import {
   BelongsToMany,
   Unique,
   BeforeDestroy,
+  HasMany,
 } from 'sequelize-typescript';
 import { v4 as uuid } from 'uuid';
-import { unlink, writeFile } from 'fs/promises';
+import { unlinkSync, writeFileSync } from 'fs';
 import path from 'path';
 
 import Identifier from '../../services/Identifier.service';
@@ -34,8 +35,8 @@ export interface AnimeDataInterface {
   name: string;
   aliases?: string[];
   description?: string;
-  seasons?: number;
-  episodes?: number;
+  status?: string;
+  content?: string;
   details?: string[];
   imageFile?: string;
   bannerFile?: string;
@@ -44,9 +45,12 @@ export interface AnimeDataInterface {
 export interface AnimeModelInterface extends AnimeDataInterface {
   uuid: string;
   identifier: string;
+  favorites?: { number: number; rating: number; };
+
   characters?: CharacterModel[];
   tags?: AnimeTagModel[];
   users?: UserModel[];
+  animeHasUsers?: UserFavoriteAnimeModel[];
 }
 
 @Table({ tableName: 'anime' })
@@ -73,20 +77,20 @@ export class AnimeModel extends Model implements AnimeModelInterface {
   @Column({ type: DataType.TEXT })
   declare description?: string;
 
-  @Column({ type: DataType.INTEGER })
-  declare seasons: number;
+  @Column({ type: DataType.TEXT })
+  declare status: string;
 
-  @Column({ type: DataType.INTEGER })
-  declare episodes: number;
+  @Column({ type: DataType.TEXT })
+  declare content: string;
 
   @Column({ type: DataType.JSON })
   declare details?: string[];
 
   @Column({
     type: DataType.TEXT,
-    async set(this: AnimeModel, file: Express.Multer.File) {
+    set(this: AnimeModel, file: Express.Multer.File) {
       const currentValue = this.getDataValue('imageFile');
-      if (currentValue) await unlink(path.join(STORAGE_PATH, 'animes/avatars', currentValue)).catch(() => null);
+      if (currentValue) unlinkSync(path.join(STORAGE_PATH, 'animes/avatars', currentValue));
       if (file.size > AVATAR_FILE_SIZE) throw new DBError('Avatar too heavy (max 5mo)');
 
       const match = file.filename.match(/^(.*)\.(.*)$/);
@@ -96,7 +100,7 @@ export class AnimeModel extends Model implements AnimeModelInterface {
       if (!['png', 'jpg'].includes(ext)) throw new DBError('Avatar must be a png or jpg');
       const fileName = `avatar_${uuid()}.${ext}`;
 
-      await writeFile(path.join(STORAGE_PATH, 'animes/avatars', fileName), file.buffer);
+      writeFileSync(path.join(STORAGE_PATH, 'animes/avatars', fileName), file.buffer);
       this.setDataValue('imageFile', fileName);
     },
   })
@@ -104,9 +108,9 @@ export class AnimeModel extends Model implements AnimeModelInterface {
 
   @Column({
     type: DataType.TEXT,
-    async set(this: AnimeModel, file: Express.Multer.File) {
+    set(this: AnimeModel, file: Express.Multer.File) {
       const currentValue = this.getDataValue('bannerFile');
-      if (currentValue) await unlink(path.join(STORAGE_PATH, 'animes/banners', currentValue)).catch(() => null);
+      if (currentValue) unlinkSync(path.join(STORAGE_PATH, 'animes/banners', currentValue));
       if (file.size > BANNER_FILE_SIZE) throw new DBError('Banner too heavy (max 5mo)');
 
       const match = file.filename.match(/^(.*)\.(.*)$/);
@@ -116,11 +120,14 @@ export class AnimeModel extends Model implements AnimeModelInterface {
       if (!['png', 'jpg'].includes(ext)) throw new DBError('Banner must be a png or jpg');
       const fileName = `banner_${uuid()}.${ext}`;
 
-      await writeFile(path.join(STORAGE_PATH, 'animes/banners', fileName), file.buffer);
+      writeFileSync(path.join(STORAGE_PATH, 'animes/banners', fileName), file.buffer);
       this.setDataValue('bannerFile', fileName);
     },
   })
   declare bannerFile?: string;
+
+  @Column({ type: DataType.VIRTUAL })
+  declare favorites?: { number: number; rating: number; };
 
   @BelongsToMany(() => AnimeTagModel, { through: () => AnimeHasTagModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare tags?: AnimeTagModel[];
@@ -131,9 +138,12 @@ export class AnimeModel extends Model implements AnimeModelInterface {
   @BelongsToMany(() => UserModel, { through: () => UserFavoriteAnimeModel, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare users?: UserModel[];
 
+  @HasMany(() => UserFavoriteAnimeModel)
+  declare animeHasUsers?: UserFavoriteAnimeModel[];
+
   @BeforeDestroy
-  static async removeFile(anime: AnimeModel) {
-    if (anime.imageFile) await unlink(path.join(STORAGE_PATH, 'animes/avatars', anime.imageFile)).catch(() => null);
-    if (anime.bannerFile) await unlink(path.join(STORAGE_PATH, 'animes/banners', anime.bannerFile)).catch(() => null);
+  static removeFile(anime: AnimeModel) {
+    if (anime.imageFile) unlinkSync(path.join(STORAGE_PATH, 'animes/avatars', anime.imageFile));
+    if (anime.bannerFile) unlinkSync(path.join(STORAGE_PATH, 'animes/banners', anime.bannerFile));
   }
 }

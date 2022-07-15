@@ -5,6 +5,8 @@ import ServiceError from './ServiceError';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default (error: Error, req: Request, res: Response, _next: NextFunction) => {
+  console.log(error);
+
   if (error instanceof APIError) {
     res.status(error.code).json({ code: error.code, message: `${error.message} (${req.url})` });
   } else if (error instanceof ServiceError) {

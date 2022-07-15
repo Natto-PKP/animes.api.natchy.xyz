@@ -1,21 +1,26 @@
 import { Router } from 'express';
+import multer from 'multer';
+
+import userFavoriteAnimeRouter from './users/userFavoriteAnimes.router';
 
 import controllers from '../controllers/users.controller';
 import asyncHandler from '../helpers/asyncHandler';
-import validate from '../middlewares/validate';
+import validate from '../middlewares/validate.middleware';
 import schemas from '../schemas/users.schema';
-import auth from '../middlewares/auth';
+import auth from '../middlewares/auth.middleware';
 
-const router = Router({ mergeParams: true });
+const upload = multer({ dest: '/tmp' });
+const userRouter = Router({ mergeParams: true });
 
-router.delete('/:userUuid', asyncHandler(auth()), asyncHandler(controllers.deleteOne));
-router.get('/', asyncHandler(auth(['ADMINISTRATOR', 'OWNER'])), validate(schemas.getAllQuery, 'query'), asyncHandler(controllers.getAll));
-router.get('/profile', validate(schemas.getAllQuery, 'query'), asyncHandler(controllers.getAllProfile));
-router.get('/:userUuid', asyncHandler(auth(['ADMINISTRATOR', 'OWNER'], true)), asyncHandler(controllers.getOne));
-router.get('/:userUuid/profile', asyncHandler(controllers.getOneProfile));
-router.patch('/:userUuid', asyncHandler(auth()), validate(schemas.updateOne, 'body'), asyncHandler(controllers.updateOne));
+userRouter.use('/animes', userFavoriteAnimeRouter);
 
-router.post('/login', validate(schemas.login, 'body'), asyncHandler(controllers.login));
-router.post('/register', validate(schemas.register, 'body'), asyncHandler(controllers.register));
+userRouter.delete('/:userUuid', asyncHandler(auth(null, true)), asyncHandler(controllers.deleteOne));
+userRouter.get('/', asyncHandler(auth()), validate(schemas.query.getAll, 'query'), asyncHandler(controllers.getAll));
+userRouter.get('/:userUuid', asyncHandler(auth()), asyncHandler(controllers.getOne));
+userRouter.get('/:userUuid/avatar', asyncHandler(auth()), asyncHandler(controllers.getOneAvatar));
+userRouter.patch('/:userUuid', asyncHandler(auth(null, true)), upload.single('avatarFile'), validate(schemas.updateOne, 'body'), asyncHandler(controllers.updateOne));
 
-export default router;
+userRouter.post('/login', validate(schemas.login, 'body'), asyncHandler(controllers.login));
+userRouter.post('/register', validate(schemas.register, 'body'), asyncHandler(controllers.register));
+
+export default userRouter;

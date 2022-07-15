@@ -1,7 +1,7 @@
 {
   "root": true,
 
-  "ignorePatterns": ["config/", "data/*"],
+  "ignorePatterns": ["config/", "seeds/*"],
 
   "overrides": [
     {
@@ -23,21 +23,6 @@
       "rules": {
         "import/no-cycle": 0,
         "no-bitwise": 0
-      }
-    },
-    {
-      "files": ["tests/**/*.test.ts"],
-      "env": { "jest": true, "node": true },
-      "plugins": ["@typescript-eslint", "jest"],
-      "extends": ["airbnb-base", "airbnb-typescript/base", "plugin:jest/all"],
-      "parser": "@typescript-eslint/parser",
-      "parserOptions": {
-        "ecmaVersion": "latest",
-        "sourceType": "module",
-        "project": "tsconfig.jest.json"
-      },
-      "rules": {
-        "jest/no-hooks": ["error", { "allow": ["beforeAll", "afterAll"] }]
       }
     }
   ]

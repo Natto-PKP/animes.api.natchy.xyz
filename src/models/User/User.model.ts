@@ -15,9 +15,9 @@ import {
 } from 'sequelize-typescript';
 import { v4 as UUID } from 'uuid';
 import bcrypt from 'bcrypt';
-import { unlink, writeFile } from 'fs/promises';
 
 import path from 'path';
+import { unlinkSync, writeFileSync } from 'fs';
 import {
   AnimeModel,
   CharacterModel,
@@ -27,7 +27,6 @@ import {
 
 import Identifier from '../../services/Identifier.service';
 import { UserPermissionsService, UserPermissionType } from '../../services/UserPermissions.service';
-import generateDiscriminator from '../../functions/generateDiscriminator';
 import DBError from '../../errors/DBError';
 
 const AVATAR_FILE_SIZE = 625e3;
@@ -84,17 +83,11 @@ export class UserModel extends Model implements UserModelInterface {
   @AllowNull(false)
   @Column({
     type: DataType.TEXT,
-    async set(this: UserModel, pseudo: string) {
-      const usersWithSamePseudo = await UserModel.findAll({ attributes: ['discriminator'], where: { pseudo }, limit: 10 });
-      const discriminator = generateDiscriminator(usersWithSamePseudo.map((u) => u.discriminator));
-      if (!discriminator) throw new DBError('Nickname already taken too many times');
-      this.setDataValue('pseudo', pseudo);
-      this.setDataValue('discriminator', discriminator);
-    },
   })
   declare pseudo: string;
 
   @AllowNull(false)
+  @Default('9999')
   @Validate({ is: /[0-9]{4}/ })
   @Column({ type: DataType.TEXT })
   declare discriminator: string;
@@ -113,7 +106,7 @@ export class UserModel extends Model implements UserModelInterface {
     type: DataType.BIGINT,
     get(this: UserModel) {
       const bit = this.getDataValue('permissions') as bigint | null;
-      return bit ? UserPermissionsService.resolve(bit) : null;
+      return bit ? UserPermissionsService.resolve(BigInt(bit)) : null;
     },
     set(this: UserModel, keys: UserPermissionType[]) {
       const value = keys.length ? UserPermissionsService.merge(keys) : null;
@@ -125,9 +118,9 @@ export class UserModel extends Model implements UserModelInterface {
   @Validate({ is: /.*\.(png|jpg)/ })
   @Column({
     type: DataType.TEXT,
-    async set(this: UserModel, file: Express.Multer.File) {
+    set(this: UserModel, file: Express.Multer.File) {
       const currentValue = this.getDataValue('avatarFile');
-      if (currentValue) await unlink(path.join(STORAGE_PATH, 'users/avatars', currentValue)).catch(() => null);
+      if (currentValue) unlinkSync(path.join(STORAGE_PATH, 'users/avatars', currentValue));
       if (file.size > AVATAR_FILE_SIZE) throw new DBError('Avatar too heavy (max 5mo)');
 
       const match = file.filename.match(/^(.*)\.(.*)$/);
@@ -137,7 +130,7 @@ export class UserModel extends Model implements UserModelInterface {
       if (!['png', 'jpg'].includes(ext)) throw new DBError('Avatar must be a png or jpg');
       const fileName = `avatar_${UUID()}.${ext}`;
 
-      await writeFile(path.join(STORAGE_PATH, 'users/avatars', fileName), file.buffer);
+      writeFileSync(path.join(STORAGE_PATH, 'users/avatars', fileName), file.buffer);
       this.setDataValue('avatarFile', fileName);
     },
   })
@@ -155,7 +148,7 @@ export class UserModel extends Model implements UserModelInterface {
   declare favoriteCharacters: CharacterModel[];
 
   @BeforeDestroy
-  static async removeFile(user: UserModel) {
-    if (user.avatarFile) await unlink(path.join(STORAGE_PATH, 'users/avatars', user.avatarFile)).catch(() => null);
+  static removeFile(user: UserModel) {
+    if (user.avatarFile) unlinkSync(path.join(STORAGE_PATH, 'users/avatars', user.avatarFile));
   }
 }

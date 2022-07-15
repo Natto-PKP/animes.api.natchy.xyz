@@ -1,13 +1,15 @@
 import { Router } from 'express';
 
 import APIError from '../errors/APIError';
-import errorHandler from '../middlewares/errorHandler';
+import errorHandler from '../errors/middleware';
 
-import user from './users.router';
+import animes from './animes.router';
+import users from './users.router';
 
 const router = Router();
 
-router.use('/users', user);
+router.use('/animes', animes);
+router.use('/users', users);
 
 router.use(errorHandler);
 router.use(() => { throw new APIError('page not fount', 404); });

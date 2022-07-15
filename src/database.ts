@@ -12,7 +12,7 @@ import {
   CharacterTraitModel,
 
   UserModel,
-  UserAnimeFavoriteAnimeModel,
+  UserFavoriteAnimeModel,
   UserFavoriteCharacterModel,
 } from './models';
 
@@ -33,7 +33,7 @@ const database = new Sequelize(process.env.PG_URI as string, {
     CharacterTraitModel,
 
     UserModel,
-    UserAnimeFavoriteAnimeModel,
+    UserFavoriteAnimeModel,
     UserFavoriteCharacterModel,
   ],
 });

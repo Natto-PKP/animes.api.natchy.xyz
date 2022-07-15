@@ -19,16 +19,14 @@ export default (permissions?: UserPermissionType[] | null, self = false) => {
     if (typeof decoded.random !== 'string') throw new APIError('Auth is failed', 401);
 
     const author = await UserModel.findByPk(decoded.uuid);
-    if (!author) throw new APIError('Account not longer exist', 401);
+    if (!author) throw new APIError('Author account not longer exist', 404);
     req.author = author;
 
-    if (
-      permissions // required permissions
-      && (
-        // author has permissions
-        author.permissions ? !author.permissions.some((flag) => permissions.includes(flag)) : true
-      ) && (self ? req.params.userUuid !== decoded.uuid : true) // token user is authorized
-    ) throw new APIError('Specific permission required', 403);
+    if (permissions) {
+      if (!(author.permissions || []).some((flag) => permissions.includes(flag))) {
+        if (self ? req.params.userUuid !== decoded.uuid : true) throw new APIError('Specific permission required', 403);
+      }
+    } else if (self && author.uuid !== req.params.userUuid) throw new APIError('Specific permission required', 403);
 
     next();
   };

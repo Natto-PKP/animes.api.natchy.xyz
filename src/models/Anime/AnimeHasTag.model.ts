@@ -14,7 +14,7 @@ export interface AnimeHasTagModelInterface {
   animeUuid: string;
 }
 
-@Table({ tableName: 'anime_has_tags', indexes: [{ unique: true, fields: ['tag_uuid', 'anime_uuid'] }] })
+@Table({ tableName: 'anime_has_tag', indexes: [{ unique: true, fields: ['tag_uuid', 'anime_uuid'] }] })
 export class AnimeHasTagModel extends Model implements AnimeHasTagModelInterface {
   @AllowNull(false)
   @ForeignKey(() => AnimeTagModel)

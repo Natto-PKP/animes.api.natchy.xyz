@@ -31,7 +31,7 @@ export interface AnimeTagModelInterface extends AnimeTagDataInterface {
   user: UserModel;
 }
 
-@Table({ tableName: 'anime_tag' })
+@Table({ tableName: 'anime_tag', indexes: [{ unique: true, fields: ['name', 'user_uuid'] }] })
 export class AnimeTagModel extends Model implements AnimeTagModelInterface {
   @PrimaryKey
   @Default(UUID)
@@ -46,7 +46,6 @@ export class AnimeTagModel extends Model implements AnimeTagModelInterface {
   declare identifier: string;
 
   @AllowNull(false)
-  @Unique
   @Column({ type: DataType.TEXT })
   declare name: string;
 

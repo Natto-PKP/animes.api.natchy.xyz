@@ -33,5 +33,5 @@ export class UserFavoriteAnimeModel
   declare userUuid: string;
 
   @Column({ type: DataType.INTEGER })
-  declare ratting?: number;
+  declare rating?: number;
 }
